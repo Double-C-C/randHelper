@@ -30,7 +30,7 @@ function App() {
     const folder = await open({
       directory: true,
       multiple: false,
-      title: "选择一个文件夹 : ",
+      title: "选择一个文件夹",
     });
     if (typeof folder === "string") {
       setDir(folder);
