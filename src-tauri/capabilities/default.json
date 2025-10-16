@@ -5,7 +5,10 @@
   "windows": [
     "main"
   ],
+  "local": true,
   "permissions": [
-    "core:default"
+    "core:default",
+    "dialog:default",
+    "dialog:allow-open"
   ]
 }
