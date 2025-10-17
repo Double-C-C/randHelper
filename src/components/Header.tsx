@@ -1,13 +1,14 @@
 import { Dice5 } from "lucide-react";
+import RandomFileCard from "./RandomFileCard";
+import RandomNumberCard from "./RandomNumberCard";
 
 export default function Header() {
   return (
-    <header className="flex items-center gap-3">
-      <div className="h-10 w-10 rounded-2x1 bg-slate-900 text-white grid place-items-center shadow">
-        <Dice5 className="h-5 w-5" />
+    <header className="h-14 border-b border-slate-200 flex items-center px-4 bg-white">
+      <div className="text-lg font-bold text-slate-800 tracking-tight">
+        🎲 随机助手
       </div>
-      <h1 className="text-2x1 font-bold tracking-tight">和一位助手</h1>
-      <p className="text-slate-500 text-sm">全是伪随机太有操作了</p>
+      <div className="ml-auto text-sm text-slate-500">盛唐小工具 版本-v0.2</div>
     </header>
   );
 }
