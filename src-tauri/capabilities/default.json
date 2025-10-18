@@ -9,6 +9,15 @@
   "permissions": [
     "core:default",
     "dialog:default",
-    "dialog:allow-open"
+    "dialog:allow-open",
+    "opener:default",
+{
+  "identifier": "opener:allow-open-path",
+  "allow": [
+    {"path": "**"}
+  ]
+},
+"opener:allow-reveal-item-in-dir",
+    "store:default"
   ]
 }

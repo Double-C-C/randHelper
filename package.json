@@ -16,6 +16,8 @@
     "@tauri-apps/api": "^2.8.0",
     "@tauri-apps/cli": "^2.8.4",
     "@tauri-apps/plugin-dialog": "^2.4.0",
+    "@tauri-apps/plugin-opener": "^2.5.0",
+    "@tauri-apps/plugin-store": "^2.4.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.546.0",

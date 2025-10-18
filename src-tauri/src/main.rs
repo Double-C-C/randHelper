@@ -63,6 +63,8 @@ fn pick_random_file(dir: String, exts: String) -> Result<String, String> {
 fn main() {
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_store::Builder::default().build())
         .invoke_handler(tauri::generate_handler![generate_random, pick_random_file])
         .run(tauri::generate_context!())
         .expect("启动tauri项目时发生错误")
