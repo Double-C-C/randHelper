@@ -1,9 +1,7 @@
-import { Separator } from "@/components/ui/separator";
 import Header from "./components/Header";
 import RandomNumberCard from "./components/RandomNumberCard";
 import RandomFileCard from "./components/RandomFileCard";
 import { useState } from "react";
-import { Sidebar, SidebarOpen } from "lucide-react";
 import SidebarItem from "./components/ui/SidebarItem";
 
 type Tab = "number" | "file";
