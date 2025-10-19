@@ -17,19 +17,18 @@ function App() {
     (async () => {
       setRfDir(await load("rf_dir", ""));
       setRfExts(await load("rf_exts", ""));
-      setRfPicked(await load("rf_picked", ""));
     })();
   }, []);
 
   //变更文件夹,picked时保存
   useEffect(() => {
-    save("rf_dir", rfDir);
+    if (rfDir) save("rf_dir", rfDir);
   }, [rfDir]);
   useEffect(() => {
-    save("rf_exts", rfExts);
+    if (rfExts) save("rf_exts", rfExts);
   }, [rfExts]);
   useEffect(() => {
-    save("rf_picked", rfPicked);
+    if (rfPicked) save("rf_picked", rfPicked);
   }, [rfPicked]);
 
   return (

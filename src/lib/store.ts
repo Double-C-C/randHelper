@@ -1,19 +1,21 @@
 // src/lib/store.ts
 import { Store } from "@tauri-apps/plugin-store";
 
-let _store: Store | null = null;
+// 预先启动一次加载，得到一个 Promise；后面统一 await 它即可
+const storePromise = Store.load(".settings.dat");
+
 export async function getStore() {
-  if (!_store) _store = new Store(".settings.dat");
-  return _store!;
+  return await storePromise;
 }
 
 export async function load<T>(key: string, fallback: T): Promise<T> {
-  const s = await getStore();
-  return ((await s.get<T>(key)) ?? fallback) as T;
+  const s = await storePromise;
+  const v = await s.get<T>(key);
+  return (v ?? fallback) as T;
 }
 
 export async function save<T>(key: string, value: T) {
-  const s = await getStore();
+  const s = await storePromise;
   await s.set(key, value);
   await s.save();
 }
