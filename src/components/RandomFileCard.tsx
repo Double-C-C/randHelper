@@ -3,12 +3,28 @@ import { invoke } from "@tauri-apps/api/core";
 import { open } from "@tauri-apps/plugin-dialog";
 import { openPath, revealItemInDir } from "@tauri-apps/plugin-opener";
 
-export default function RandomFileCard() {
+type Props = {
+  dir: string;
+  setDir: (v: string) => void;
+  exts: string;
+  setExts: (v: string) => void;
+  picked: string;
+  setPicked: (v: string) => void;
+};
+
+export default function RandomFileCard({
+  dir,
+  setDir,
+  exts,
+  setExts,
+  picked,
+  setPicked,
+}: Props) {
   //新增 : 随机指定格式文件
 
-  const [dir, setDir] = useState<string | null>(null);
-  const [exts, setExts] = useState<string>(".jpg,.png");
-  const [picked, setPicked] = useState<string | null>("debug");
+  // const [dir, setDir] = useState<string | null>(null);
+  // const [exts, setExts] = useState<string>(".jpg,.png");
+  // const [picked, setPicked] = useState<string | null>("debug");
   const [err, setErr] = useState<string | null>(null);
 
   async function chooseFolder() {
@@ -19,7 +35,7 @@ export default function RandomFileCard() {
     });
     if (typeof folder === "string") {
       setDir(folder);
-      setPicked(null);
+      setPicked("");
       setErr(null);
     }
   }
@@ -89,26 +105,31 @@ export default function RandomFileCard() {
           </button>
         </div>
       </div>
-<div className="rounded-xl border border-slate-200 p-4 bg-white space-y-3 mt-6">
-     {picked && (
-        <div className="rounded-md bg-slate-50 border-slate-200 p-2 text-sm break-all text-center">
-          选中文件 <span className="font-bold">{picked} </span> !
-        </div>
-      )}
-            {picked && <div className="flex justify-center gap-4 mt-3">
-              <button className="rounded-lg border border-slate-300 shadow-2xl text-gray-600 
+      <div className="rounded-xl border border-slate-200 p-4 bg-white space-y-3 mt-6">
+        {picked && (
+          <div className="rounded-md bg-slate-50 border-slate-200 p-2 text-sm break-all text-center">
+            选中文件 <span className="font-bold">{picked} </span> !
+          </div>
+        )}
+        {picked && (
+          <div className="flex justify-center gap-4 mt-3">
+            <button
+              className="rounded-lg border border-slate-300 shadow-2xl text-gray-600 
               px-3 py-1 hover:bg-slate-50 hover:text-gray-700"
-              onClick={openFile}>打开文件</button>
-              <button className="rounded-lg border border-slate-300 shadow-2xl text-gray-600 
+              onClick={openFile}
+            >
+              打开文件
+            </button>
+            <button
+              className="rounded-lg border border-slate-300 shadow-2xl text-gray-600 
               px-3 py-1 hover:bg-slate-50 hover:text-gray-700"
-              onClick={revealFile}>在文件夹里显示</button>
-              
-              </div>}
-</div>
-
-
-
-
+              onClick={revealFile}
+            >
+              在文件夹里显示
+            </button>
+          </div>
+        )}
+      </div>
 
       {err && (
         <div className="text-sm text-rase-700 bg-rose-50 border border-rose-300 p-2 rounded mt-3">
