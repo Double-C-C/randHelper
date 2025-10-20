@@ -4,8 +4,9 @@ import RandomFileCard from "./components/RandomFileCard";
 import { useEffect, useState } from "react";
 import SidebarItem from "./components/ui/SidebarItem";
 import { load, save } from "./lib/store";
+import RandomFileHistory from "./components/RandomFileHistory";
 
-type Tab = "number" | "file";
+type Tab = "number" | "file" | "debug";
 
 function App() {
   const [tab, setTab] = useState<Tab>("number");
@@ -52,6 +53,13 @@ function App() {
               label="随机文件"
               desc="可指定格式"
             />
+                        <SidebarItem
+              active={tab === "debug"}
+              onClick={() => setTab("debug")}
+              emoji="**"
+              label="开发"
+              desc="11111"
+            />
           </nav>
         </aside>
 
@@ -67,6 +75,7 @@ function App() {
               setPicked={setRfPicked}
             />
           )}
+          {tab === "debug" && <RandomFileHistory />}
         </main>
       </div>
     </div>

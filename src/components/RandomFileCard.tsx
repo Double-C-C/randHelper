@@ -2,6 +2,7 @@ import { useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { open } from "@tauri-apps/plugin-dialog";
 import { openPath, revealItemInDir } from "@tauri-apps/plugin-opener";
+import RandomFileHistory from "./RandomFileHistory";
 
 type Props = {
   dir: string;
@@ -26,6 +27,7 @@ export default function RandomFileCard({
   // const [exts, setExts] = useState<string>(".jpg,.png");
   // const [picked, setPicked] = useState<string | null>("debug");
   const [err, setErr] = useState<string | null>(null);
+  const [selected,setSelected] = useState<string | null>("selection1");
 
   async function chooseFolder() {
     const folder = await open({
@@ -69,6 +71,11 @@ export default function RandomFileCard({
       setErr(String(e));
     }
   }
+
+  async function ImDebugging() {
+    setDir("debugFile");
+    setPicked("debugFile");
+  } 
 
   return (
     <section className="max-w-2xl">
@@ -135,6 +142,10 @@ export default function RandomFileCard({
         <div className="text-sm text-rase-700 bg-rose-50 border border-rose-300 p-2 rounded mt-3">
           发生错误 : {err}
         </div>
+      )}
+
+      {selected && (
+        <RandomFileHistory />
       )}
     </section>
   );
