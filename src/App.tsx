@@ -1,36 +1,11 @@
 import Header from "./components/Header";
 import RandomNumberCard from "./components/RandomNumberCard";
 import RandomFileCard from "./components/RandomFileCard";
-import { useEffect, useState } from "react";
 import SidebarItem from "./components/ui/SidebarItem";
-import { load, save } from "./lib/store";
-import RandomFileHistory from "./components/RandomFileHistory";
-
-type Tab = "number" | "file" | "debug";
+import { setState, useStore } from "./store/runtimeStore";
 
 function App() {
-  const [tab, setTab] = useState<Tab>("number");
-  const [rfDir, setRfDir] = useState("");
-  const [rfExts, setRfExts] = useState(".jpg,.png");
-  const [rfPicked, setRfPicked] = useState("");
-
-  useEffect(() => {
-    (async () => {
-      setRfDir(await load("rf_dir", ""));
-      setRfExts(await load("rf_exts", ""));
-    })();
-  }, []);
-
-  //变更文件夹,picked时保存
-  useEffect(() => {
-    if (rfDir) save("rf_dir", rfDir);
-  }, [rfDir]);
-  useEffect(() => {
-    if (rfExts) save("rf_exts", rfExts);
-  }, [rfExts]);
-  useEffect(() => {
-    if (rfPicked) save("rf_picked", rfPicked);
-  }, [rfPicked]);
+  const tab = useStore((s) => s.tab);
 
   return (
     <div className="h-screen w-screen flex flex-col bg-slate-50 text-slate-900">
@@ -41,41 +16,24 @@ function App() {
           <nav className="space-y-1">
             <SidebarItem
               active={tab === "number"}
-              onClick={() => setTab("number")}
+              onClick={() => setState({ tab: "number" })}
               emoji="🔢"
               label="随机数字"
               desc="区间内取整"
             />
             <SidebarItem
               active={tab === "file"}
-              onClick={() => setTab("file")}
+              onClick={() => setState({ tab: "file" })}
               emoji="📁"
               label="随机文件"
               desc="可指定格式"
-            />
-                        <SidebarItem
-              active={tab === "debug"}
-              onClick={() => setTab("debug")}
-              emoji="**"
-              label="开发"
-              desc="11111"
             />
           </nav>
         </aside>
 
         <main className="flex-1 p-6 overflow-auto">
           {tab === "number" && <RandomNumberCard />}
-          {tab === "file" && (
-            <RandomFileCard
-              dir={rfDir}
-              setDir={setRfDir}
-              exts={rfExts}
-              setExts={setRfExts}
-              picked={rfPicked}
-              setPicked={setRfPicked}
-            />
-          )}
-          {tab === "debug" && <RandomFileHistory />}
+          {tab === "file" && <RandomFileCard />}
         </main>
       </div>
     </div>
