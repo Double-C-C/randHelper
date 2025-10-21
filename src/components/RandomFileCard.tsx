@@ -54,7 +54,7 @@ export default function RandomFileCard({
     }
   }
 
-  async function openFile() {
+  async function openFile(picked:string) {
     if (!picked) return;
     try {
       await openPath(picked);
@@ -63,7 +63,7 @@ export default function RandomFileCard({
     }
   }
 
-  async function revealFile() {
+  async function revealFile(picked:string) {
     if (!picked) return;
     try {
       await revealItemInDir(picked);
@@ -123,14 +123,14 @@ export default function RandomFileCard({
             <button
               className="rounded-lg border border-slate-300 shadow-2xl text-gray-600 
               px-3 py-1 hover:bg-slate-50 hover:text-gray-700"
-              onClick={openFile}
+              onClick={() => openFile(picked)}
             >
               打开文件
             </button>
             <button
               className="rounded-lg border border-slate-300 shadow-2xl text-gray-600 
               px-3 py-1 hover:bg-slate-50 hover:text-gray-700"
-              onClick={revealFile}
+              onClick={() => revealFile(picked)}
             >
               在文件夹里显示
             </button>

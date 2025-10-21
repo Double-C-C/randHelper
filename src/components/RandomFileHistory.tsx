@@ -1,14 +1,25 @@
 import { File } from "lucide-react";
+import {HistoryItem} from "@/store/runtimeStore"
 
-type HistoryItem = {
-    id:string;
-    name:string;
-    path:string;
-    at:string;
+
+
+type RandomFileHistoryProps = {
+    history:HistoryItem[];
+    openFile:(Filepath:string) => void;
+    revealFile:(Filepath:string) => void;
+    clearHistory:() => void;
+
 }
 
-export default function RandomFileHistory() {
+export default function RandomFileHistory({
+    history,
+    openFile,
+    revealFile,
+    clearHistory
+} : RandomFileHistoryProps) {
 
+
+//测试用例
 const items:HistoryItem[] = [
     {id:"1",name:"test1.png",path:"D:/draws/bag/test1.png",at:"now"},
     {id:"2",name:"test2.png",path:"D:/draws/bag/test2.png",at:"now"},
@@ -22,16 +33,17 @@ const items:HistoryItem[] = [
                 <h3 className="text-sm font-semibold text-gray-700 ">
                 前五次随机历史
                 </h3>
-            <button className="rounded-2xl border border-slate-400 p-2 text-sm text-gray-500 bg-white">
+            <button className="rounded-2xl border border-slate-400 p-2 text-sm text-gray-500 bg-white"
+            onClick={clearHistory}>
                 清空
             </button>
             </div>
 
 <ul className="rounded-lg border border-slate-200 bg-white my-3">
-    {items.length === 0 ? (
+    {history.length === 0 ? (
         <li className="p-4 text-sm text-slate-500 ">暂无历史</li>):
         (
-            items.map((it) => (
+            history.map((it) => (
                 <li key={it.id} className="p-3 flex items-center gap-3">
                     <div className="w-8 h-8 shrink-0 grid place-items-center rounded bg-slate-100 text-slate-500"><File/></div>
                 
@@ -45,10 +57,12 @@ const items:HistoryItem[] = [
                 </div>
 
                 <div className="flex gap-2">
-                    <button className="px-2 py-1 text-xs rounded border border-sky-100 bg-white text-slate-500 hover:border-slate-300">
+                    <button className="px-2 py-1 text-xs rounded border border-sky-100 bg-white text-slate-500 hover:border-slate-300"
+                    onClick={() => openFile(it.path)}>
                         打开
                     </button>
-                                        <button className="px-2 py-1 text-xs rounded border border-sky-100 bg-white text-slate-500 hover:border-slate-300">
+                                        <button className="px-2 py-1 text-xs rounded border border-sky-100 bg-white text-slate-500 hover:border-slate-300"
+                                        onClick={() => revealFile(it.path)}>
                         位置
                     </button>
                 </div>
