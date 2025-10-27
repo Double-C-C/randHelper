@@ -3,8 +3,9 @@ import { invoke } from "@tauri-apps/api/core";
 import { open } from "@tauri-apps/plugin-dialog";
 import { openPath, revealItemInDir } from "@tauri-apps/plugin-opener";
 import RandomFileHistory from "./RandomFileHistory";
-import { setState, useStore } from "@/store/runtimeStore";
 import type { HistoryItem } from "@/store/runtimeStore";
+import { get } from "@/lib/KVPerf";
+
 
 function basename(p: string) {
   const parts = p.split(/[/\\]/);
@@ -25,12 +26,24 @@ function nowStr() {
   )}:${pad(d.getMinutes())}`;
 }
 
+function pushHistoryItem(
+  prev: HistoryItem[],
+  item: Omit<HistoryItem, "id" | "at">,
+  limit = 5
+): HistoryItem[] {
+  const now = new Date().toISOString();
+
+  const shifted = prev.map(it => ({ ...it, id: it.id + 1 }));
+  const updated = [{ ...item, id: 0, at: now }, ...shifted];
+
+  return updated.slice(0, limit);
+}
 export default function RandomFileCard() {
-  //使用全局储存量useStore
-  const dir = useStore((s) => s.dir);
-  const exts = useStore((s) => s.exts);
-  const picked = useStore((s) => s.picked);
-  const history = useStore((s) => s.history);
+  //使用全局KV储存
+  const[dir,setDir] = useState<string>(() => get<string>("rf.dir") || "");
+  const[exts,setExts] = useState<string>(() => get<string>("rf.exts") || "");
+  const[picked,setPicked] = useState<string>(() => get<string>("rf.picked") || "");
+  const[test,setTest] = useState<string>(() => get<string>("test") || "");
 
   //新增 : 随机指定格式文件
 
@@ -47,7 +60,8 @@ export default function RandomFileCard() {
       title: "选择一个文件夹",
     });
     if (typeof folder === "string") {
-      setState({ dir: folder, picked: "" });
+setDir(folder);
+setPicked("");
       setErr(null);
     }
   }
@@ -57,7 +71,7 @@ export default function RandomFileCard() {
     try {
       setErr(null);
       const file = await invoke<string>("pick_random_file", { dir, exts });
-      setState({ picked: file });
+setPicked(file);
 
       //增加历史记录
 
