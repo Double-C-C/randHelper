@@ -4,8 +4,7 @@ import { open } from "@tauri-apps/plugin-dialog";
 import { openPath, revealItemInDir } from "@tauri-apps/plugin-opener";
 import RandomFileHistory from "./RandomFileHistory";
 import type { HistoryItem } from "@/store/runtimeStore";
-import { get } from "@/lib/KVPerf";
-
+import { get, set } from "@/lib/KVPerf";
 
 function basename(p: string) {
   const parts = p.split(/[/\\]/);
@@ -31,27 +30,30 @@ function pushHistoryItem(
   item: Omit<HistoryItem, "id" | "at">,
   limit = 5
 ): HistoryItem[] {
-  const now = new Date().toISOString();
-
-  const shifted = prev.map(it => ({ ...it, id: it.id + 1 }));
-  const updated = [{ ...item, id: 0, at: now }, ...shifted];
+  const newItem: HistoryItem = {
+    ...item,
+    id: Date.now(),
+    at: nowStr(),
+  };
+  const updated = [newItem, ...prev];
 
   return updated.slice(0, limit);
 }
 export default function RandomFileCard() {
   //使用全局KV储存
-  const[dir,setDir] = useState<string>(() => get<string>("rf.dir") || "");
-  const[exts,setExts] = useState<string>(() => get<string>("rf.exts") || "");
-  const[picked,setPicked] = useState<string>(() => get<string>("rf.picked") || "");
-  const[test,setTest] = useState<string>(() => get<string>("test") || "");
+  const [dir, setDir] = useState<string>(() => get<string>("rf.dir") || "");
+  const [exts, setExts] = useState<string>(
+    () => get<string>("rf.exts") || ".jpg,.png"
+  );
+  const [picked, setPicked] = useState<string>(
+    () => get<string>("rf.picked") || ""
+  );
 
   //新增 : 随机指定格式文件
-
-  // const [dir, setDir] = useState<string | null>(null);
-  // const [exts, setExts] = useState<string>(".jpg,.png");
-  // const [picked, setPicked] = useState<string | null>("debug");
+  const [history, setHistory] = useState<HistoryItem[]>(
+    () => get<HistoryItem[]>("rf.history") || []
+  );
   const [err, setErr] = useState<string | null>(null);
-  const [selected, setSelected] = useState<string | null>("selection1");
 
   async function chooseFolder() {
     const folder = await open({
@@ -60,8 +62,10 @@ export default function RandomFileCard() {
       title: "选择一个文件夹",
     });
     if (typeof folder === "string") {
-setDir(folder);
-setPicked("");
+      setDir(folder);
+      //往cache里面存入dir
+      set<string>("rf.dir", folder);
+      setPicked("");
       setErr(null);
     }
   }
@@ -71,17 +75,18 @@ setPicked("");
     try {
       setErr(null);
       const file = await invoke<string>("pick_random_file", { dir, exts });
-setPicked(file);
-
+      setPicked(file);
+      set<string>("rf.picked", file);
+      set<string>("rf.exts", exts);
       //增加历史记录
-
-      const item: HistoryItem = {
-        path: file,
+      const newHistory = pushHistoryItem(history, {
         name: basename(file),
-        at: nowStr(),
-      };
+        path: file,
+      });
+      set<HistoryItem[]>("rf.history", newHistory);
+      setHistory(newHistory);
     } catch (e: any) {
-      setState({ picked: "" });
+      setPicked("");
       setErr(String(e));
     }
   }
@@ -102,6 +107,11 @@ setPicked(file);
     } catch (e: any) {
       setErr(String(e));
     }
+  }
+
+  async function clearHistory() {
+    setHistory([]);
+    set<HistoryItem[]>("rf.history", []);
   }
 
   return (
@@ -125,7 +135,7 @@ setPicked(file);
           <span className="text-sm text-slate-600">扩展名(英文逗号分隔)</span>
           <input
             value={exts}
-            onChange={(e) => setState({ exts: e.target.value })}
+            onChange={(e) => setExts(e.target.value)}
             placeholder=".jpg,.png"
             className="flex-1 rounded-md border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-400 "
           />
@@ -171,7 +181,14 @@ setPicked(file);
         </div>
       )}
 
-      {selected && <RandomFileHistory />}
+      {history && (
+        <RandomFileHistory
+          history={history}
+          openFile={openFile}
+          revealFile={revealFile}
+          clearHistory={clearHistory}
+        />
+      )}
     </section>
   );
 }

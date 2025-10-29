@@ -54,3 +54,4 @@ pnpm-debug.log*
 
 # Optional: if you build installers
 src-tauri/target/release/bundle/
+target/rust-analyzer/
