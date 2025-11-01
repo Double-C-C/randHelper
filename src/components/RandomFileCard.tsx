@@ -32,7 +32,7 @@ function pushHistoryItem(
 ): HistoryItem[] {
   const newItem: HistoryItem = {
     ...item,
-    id: Date.now(),
+    id: Date.now().toString(),
     at: nowStr(),
   };
   const updated = [newItem, ...prev];

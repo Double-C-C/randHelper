@@ -1,7 +1,7 @@
 import { useSyncExternalStore} from "react";
 
 export type HistoryItem = {
-    id : number;
+    id : string;
     name:string;
     path:string;
     at:string;

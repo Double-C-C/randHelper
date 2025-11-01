@@ -66,7 +66,7 @@ fn pick_random_file(dir: String, exts: String) -> Result<String, String> {
 }
 
 #[command]
-fn generate_thumnail(path: String, max_width: u32, max_height: u32) -> Result<String, String> {
+fn generate_thumbnail(path: String, max_width: u32, max_height: u32) -> Result<String, String> {
     let p = Path::new(&path);
     let file = File::open(p).map_err(|e| e.to_string())?;
     let reader = BufReader::new(file);
@@ -98,7 +98,7 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             generate_random,
             pick_random_file,
-            generate_thumnail
+            generate_thumbnail
         ])
         .run(tauri::generate_context!())
         .expect("启动tauri项目时发生错误")
