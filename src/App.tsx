@@ -12,7 +12,7 @@ function App() {
       <Header />
 
       <div className="flex flex-1 overflow-hidden">
-        <aside className="w-60 border-r border-slate-200 p-4 flex flex-col">
+        <aside className="w-40 border-r border-slate-200 p-4 flex flex-col">
           <nav className="space-y-1">
             <SidebarItem
               active={tab === "number"}
