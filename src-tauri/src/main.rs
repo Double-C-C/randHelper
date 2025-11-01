@@ -1,9 +1,14 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+use base64::engine::general_purpose;
+use base64::Engine;
+use image::io::Reader;
 use rand::{seq::SliceRandom, Rng};
 use std::collections::hash_map::Entry;
 use std::fmt::format;
+use std::fs::File;
+use std::io::{BufReader, Cursor};
 use std::{fs, path::Path};
 use tauri::command;
 use tauri::Manager;
@@ -60,12 +65,41 @@ fn pick_random_file(dir: String, exts: String) -> Result<String, String> {
     Ok(files.choose(&mut rng).ok_or("随机选择失败")?.to_string())
 }
 
+#[command]
+fn generate_thumnail(path: String, max_width: u32, max_height: u32) -> Result<String, String> {
+    let p = Path::new(&path);
+    let file = File::open(p).map_err(|e| e.to_string())?;
+    let reader = BufReader::new(file);
+
+    let format = image::ImageFormat::from_path(p).map_err(|e| e.to_string())?;
+    let img = image::load(reader, format).map_err(|e| e.to_string())?;
+
+    let thumb = img.thumbnail(max_width, max_height);
+
+    let mut buf = Cursor::new(Vec::<u8>::new());
+
+    thumb
+        .write_to(&mut buf, image::ImageFormat::Png)
+        .map_err(|e| e.to_string())?;
+
+    let png_bytes = buf.into_inner();
+
+    let b64 = general_purpose::STANDARD.encode(png_bytes);
+    let data_url = format!("data:image/png;base64,{}", b64);
+
+    Ok(data_url)
+}
+
 fn main() {
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_store::Builder::default().build())
-        .invoke_handler(tauri::generate_handler![generate_random, pick_random_file])
+        .invoke_handler(tauri::generate_handler![
+            generate_random,
+            pick_random_file,
+            generate_thumnail
+        ])
         .run(tauri::generate_context!())
         .expect("启动tauri项目时发生错误")
 }
