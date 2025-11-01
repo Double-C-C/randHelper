@@ -3,7 +3,9 @@
 
 use base64::engine::general_purpose;
 use base64::Engine;
+use image::codecs::jpeg::JpegEncoder;
 use image::io::Reader;
+use image::{ColorType, ImageEncoder};
 use rand::{seq::SliceRandom, Rng};
 use std::collections::hash_map::Entry;
 use std::fmt::format;
@@ -78,13 +80,26 @@ fn generate_thumbnail(path: String, max_width: u32, max_height: u32) -> Result<S
 
     let mut buf = Cursor::new(Vec::<u8>::new());
 
-    thumb
-        .write_to(&mut buf, image::ImageFormat::Png)
+    let rgb_thumb = thumb.to_rgb8();
+
+    let mut encoder = JpegEncoder::new_with_quality(&mut buf, 80);
+
+    encoder
+        .write_image(
+            &rgb_thumb,
+            thumb.width(),
+            thumb.height(),
+            ColorType::Rgb8.into(),
+        )
         .map_err(|e| e.to_string())?;
 
-    let png_bytes = buf.into_inner();
+    // thumb
+    //     .write_to(&mut buf, image::ImageFormat::Jpeg)
+    //     .map_err(|e| e.to_string())?;
 
-    let b64 = general_purpose::STANDARD.encode(png_bytes);
+    let jpeg_bytes = buf.into_inner();
+
+    let b64 = general_purpose::STANDARD.encode(jpeg_bytes);
     let data_url = format!("data:image/png;base64,{}", b64);
 
     Ok(data_url)

@@ -24,6 +24,7 @@ export default function RandomFileHistory({
 
   const [loading, SetLoading] = useState(false);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const handleSelect = useCallback(
@@ -37,8 +38,8 @@ export default function RandomFileHistory({
       try {
         const dataUrl = await invoke<string>("generate_thumbnail", {
           path: item.path,
-          maxWidth: 200,
-          maxHeight: 200,
+          maxWidth: 128,
+          maxHeight: 128,
         });
 
         setThumbCache((prev) => ({
@@ -111,7 +112,6 @@ export default function RandomFileHistory({
                 <div className="hidden md:block text-xs text-slate-400 mr-2 whitespace-nowrap">
                   {it.at}
                 </div>
-
                 <div className="flex gap-2">
                   <button
                     className="px-2 py-1 text-xs rounded border border-sky-100 bg-white text-slate-500 hover:border-slate-300"

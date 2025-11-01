@@ -11,11 +11,11 @@ function basename(p: string) {
   return parts[parts.length - 1] || p;
 }
 
-function dirname(p: string) {
-  const parts = p.split(/[/\\]/);
-  parts.pop();
-  return parts.join("/") || p;
-}
+// function dirname(p: string) {
+//   const parts = p.split(/[/\\]/);
+//   parts.pop();
+//   return parts.join("/") || p;
+// }
 
 function nowStr() {
   const d = new Date();
