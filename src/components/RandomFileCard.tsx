@@ -55,6 +55,9 @@ export default function RandomFileCard() {
   );
   const [err, setErr] = useState<string | null>(null);
 
+  //新增 : 子目录递归搜索
+  const [recursive, setRecursive] = useState<boolean>(false);
+
   async function chooseFolder() {
     const folder = await open({
       directory: true,
@@ -74,7 +77,11 @@ export default function RandomFileCard() {
     if (!dir) return;
     try {
       setErr(null);
-      const file = await invoke<string>("pick_random_file", { dir, exts });
+      const file = await invoke<string>("pick_random_file", {
+        dir,
+        exts,
+        recursive,
+      });
       setPicked(file);
       set<string>("rf.picked", file);
       set<string>("rf.exts", exts);
@@ -147,6 +154,22 @@ export default function RandomFileCard() {
           >
             抽一个!
           </button>
+        </div>
+        <div className="flex items-center gap-2">
+          {/* 递归搜索复选框 */}
+          <label
+            htmlFor="recursive"
+            className="flex items-center gap-2 select-none px-2 py-1 rounded-md hover:bg-slate-50"
+          >
+            <input
+              id="recursive"
+              type="checkbox"
+              checked={recursive}
+              onChange={(e) => setRecursive(e.target.checked)}
+              className="h-4 w-4 accent-slate-900"
+            />
+            <span className="text-sm text-slate-700">递归搜索子目录</span>
+          </label>
         </div>
       </div>
       <div className="rounded-xl border border-slate-200 p-4 bg-white space-y-3 mt-6">

@@ -14,6 +14,7 @@ use std::io::{BufReader, Cursor};
 use std::{fs, path::Path};
 use tauri::command;
 use tauri::Manager;
+use walkdir::WalkDir;
 
 #[tauri::command]
 fn generate_random(min: i32, max: i32) -> Result<i32, String> {
@@ -25,7 +26,7 @@ fn generate_random(min: i32, max: i32) -> Result<i32, String> {
 }
 
 #[command]
-fn pick_random_file(dir: String, exts: String) -> Result<String, String> {
+fn pick_random_file(dir: String, exts: String, recursive: bool) -> Result<String, String> {
     let p = Path::new(&dir);
     if !p.is_dir() {
         return Err("指定路径不是文件夹!".into());
@@ -46,14 +47,34 @@ fn pick_random_file(dir: String, exts: String) -> Result<String, String> {
     }
 
     let mut files = Vec::new();
-    for entry in fs::read_dir(p).map_err(|e| e.to_string())? {
-        let entry = entry.map_err(|e| e.to_string())?;
-        let fp = entry.path();
 
-        if fp.is_file() {
-            if let Some(my_ext) = fp.extension().and_then(|e| e.to_str()) {
-                if want_exts.contains(&my_ext.to_lowercase()) {
+    if recursive {
+        for entry in WalkDir::new(p).follow_links(false).into_iter() {
+            let entry = match entry {
+                Ok(e) => e,
+                Err(_) => continue,
+            };
+
+            if !entry.file_type().is_file() {
+                continue;
+            }
+            let fp = entry.path();
+            if let Some(ext) = fp.extension().and_then(|e| e.to_str()) {
+                if want_exts.contains(&exts.to_lowercase()) {
                     files.push(fp.to_string_lossy().to_string());
+                }
+            };
+        }
+    } else {
+        for entry in fs::read_dir(p).map_err(|e| e.to_string())? {
+            let entry = entry.map_err(|e| e.to_string())?;
+            let fp = entry.path();
+
+            if fp.is_file() {
+                if let Some(my_ext) = fp.extension().and_then(|e| e.to_str()) {
+                    if want_exts.contains(&my_ext.to_lowercase()) {
+                        files.push(fp.to_string_lossy().to_string());
+                    }
                 }
             }
         }
